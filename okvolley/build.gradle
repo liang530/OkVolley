@@ -21,8 +21,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
-
+//在https://github.com/kymjs/RxVolley基础上去除了rxjava,添加对okhttp3的支持，修复请求参数没有url编码的问题
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
@@ -30,3 +33,21 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     provided 'com.squareup.okhttp3:okhttp:3.4.1'
 }
+
+//删除目录下的制定jar
+task clearJar(type: Delete) {
+    delete 'build/outputs/okvolly_'+android.defaultConfig.versionName+'.jar'
+}
+//对默认生成的jar进行复制到制定位置并重命名
+task renameJar(type: Copy) {
+    //源路径
+    from('build/intermediates/bundles/release/')
+    //目标路径
+    into('build/outputs/')
+    //包含的文件
+    include('classes.jar')
+    //重命名(源文件名字,目标文件名字)
+    rename ('classes.jar', 'okvolly_'+android.defaultConfig.versionName+'.jar')
+}
+//添加任务依赖,renameJar依赖与clearJar和build
+renameJar.dependsOn(clearJar, build)
