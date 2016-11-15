@@ -95,4 +95,10 @@ public class DefaultRetryPolicy implements RetryPolicy {
     protected boolean hasAttemptRemaining() {
         return mCurrentRetryCount <= mMaxNumRetries;
     }
+
+
+    public void setCustomerDefault(int initialTimeoutMs, int maxNumRetries, float backoffMultiplier){
+
+
+    }
 }

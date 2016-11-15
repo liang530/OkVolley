@@ -17,6 +17,7 @@ package com.kymjs.rxvolley;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.kymjs.rxvolley.client.FileRequest;
 import com.kymjs.rxvolley.client.FormRequest;
@@ -31,8 +32,11 @@ import com.kymjs.rxvolley.http.RequestQueue;
 import com.kymjs.rxvolley.http.RetryPolicy;
 import com.kymjs.rxvolley.interf.ICache;
 import com.kymjs.rxvolley.toolbox.FileUtils;
+import com.kymjs.rxvolley.toolbox.HttpParamsEntry;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * 主入口
@@ -40,10 +44,13 @@ import java.io.File;
  * @author kymjs (http://www.kymjs.com/) on 12/17/15.
  */
 public class RxVolley {
-
+    private static final String TAG = RxVolley.class.getSimpleName();
+    private static boolean isDebug=false;
+    public static void setDebug(boolean isDebug){
+        RxVolley.isDebug=isDebug;
+    }
     private RxVolley() {
     }
-
     public final static File CACHE_FOLDER = FileUtils.getSaveFolder("RxVolley");
 
     private static RequestQueue sRequestQueue;
@@ -98,6 +105,7 @@ public class RxVolley {
      * 构建器
      */
     public static class Builder {
+
         private HttpParams params;
         private int contentType;
         private HttpCallback callback;
@@ -257,11 +265,23 @@ public class RxVolley {
                         httpConfig.mShouldCache = Boolean.FALSE;
                     }
                 }
-
                 if (contentType == ContentType.JSON) {
                     request = new JsonRequest(httpConfig, params, callback);
                 } else {
                     request = new FormRequest(httpConfig, params, callback);
+                }
+                if(isDebug){
+                    Log.d(TAG,"############开始联网############");
+                    Log.d(TAG,"联网地址http_url="+httpConfig.mUrl);
+                    StringBuffer buffer=new StringBuffer();
+                    for(HttpParamsEntry entry:params.getUrlParamsMap()){
+                        try {
+                            buffer.append(entry.k).append(":").append(URLDecoder.decode(entry.v,"utf-8")).append("\n");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Log.d(TAG,buffer.toString());
                 }
 
                 request.setTag(httpConfig.mTag);
@@ -276,6 +296,7 @@ public class RxVolley {
             }
             return this;
         }
+
         /**
          * 执行请求任务
          */
