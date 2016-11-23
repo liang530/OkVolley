@@ -234,7 +234,6 @@ public class RequestQueue {
         if (tag == null) {
             throw new IllegalArgumentException("Cannot cancelAll with a null tag");
         }
-        Loger.debug("取消了tag为"+tag+"的联网");
         cancelAll(new RequestFilter() {
             @Override
             public boolean apply(Request<?> request) {

@@ -96,13 +96,12 @@ public class FormRequest extends Request<byte[]> {
 
     @Override
     protected void deliverResponse(ArrayList<HttpParamsEntry> headers, final byte[] response) {
-        HttpCallback httpCallback = weakMCallback.get();
-        if (httpCallback != null) {
+        if (mCallback != null) {
             HashMap<String, String> map = new HashMap<>(headers.size());
             for (HttpParamsEntry entry : headers) {
                 map.put(entry.k, entry.v);
             }
-            httpCallback.onSuccess(map, response);
+            mCallback.onSuccess(map, response);
         }
     }
 
