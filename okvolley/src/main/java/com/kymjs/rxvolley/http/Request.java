@@ -122,6 +122,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     public void finish(String log) {
         Loger.debug(log);
+        mTag=null;
+        mConfig.mTag=null;
         if (mRequestQueue != null) {
             mRequestQueue.finish(this);
         }
@@ -161,6 +163,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
     public void cancel() {
         mCanceled = true;
+        mTag=null;
+        mConfig.mTag=null;
     }
 
     public boolean isCanceled() {
