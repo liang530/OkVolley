@@ -27,6 +27,7 @@ import com.kymjs.rxvolley.toolbox.HttpParamsEntry;
 import com.kymjs.rxvolley.toolbox.Loger;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
@@ -47,7 +48,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     public Object mTag;
     public Integer mSequence;
 
-    protected final HttpCallback mCallback;
+    protected final WeakReference<HttpCallback> weakMCallback;
     protected ProgressListener mProgressListener;
     protected RequestQueue mRequestQueue;
     private ICache.Entry mCacheEntry = null;
@@ -57,7 +58,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             config = new RequestConfig();
         }
         mConfig = config;
-        mCallback = callback;
+        weakMCallback = new WeakReference<HttpCallback>(callback);
         mDefaultTrafficStatsTag = findDefaultTrafficStatsTag(config.mUrl);
     }
 
@@ -90,7 +91,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     }
 
     public HttpCallback getCallback() {
-        return mCallback;
+        return weakMCallback.get();
     }
 
     /**
@@ -285,7 +286,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * @param error 原因
      */
     public void deliverError(VolleyError error) {
-        if(this.mCallback != null) {
+        HttpCallback httpCallback = this.weakMCallback.get();
+        if(httpCallback != null) {
             String strMsg = "";
             int errorNo;
             if(error != null) {
@@ -308,14 +310,14 @@ public abstract class Request<T> implements Comparable<Request<T>> {
                 errorMsg = new String(error.networkResponse.data);
             }
 
-            this.mCallback.onFailure(errorNo, strMsg, errorMsg);
+            httpCallback.onFailure(errorNo, strMsg, errorMsg);
         }
 
     }
 
     public void deliverStartHttp() {
-        if (mCallback != null) {
-            mCallback.onPreHttp();
+        if (weakMCallback.get() != null) {
+            weakMCallback.get().onPreHttp();
         }
     }
 
@@ -323,8 +325,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * Http请求完成(不论成功失败)
      */
     public void requestFinish() {
-        if (mCallback != null) {
-            mCallback.onFinish();
+        if (weakMCallback.get() != null) {
+            weakMCallback.get().onFinish();
         }
     }
 
