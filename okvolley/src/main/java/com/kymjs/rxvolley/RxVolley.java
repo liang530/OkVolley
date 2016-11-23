@@ -33,6 +33,7 @@ import com.kymjs.rxvolley.http.RetryPolicy;
 import com.kymjs.rxvolley.interf.ICache;
 import com.kymjs.rxvolley.toolbox.FileUtils;
 import com.kymjs.rxvolley.toolbox.HttpParamsEntry;
+import com.kymjs.rxvolley.toolbox.Loger;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -48,6 +49,7 @@ public class RxVolley {
     private static boolean isDebug=false;
     public static void setDebug(boolean isDebug){
         RxVolley.isDebug=isDebug;
+        Loger.setEnable(isDebug);
     }
     private RxVolley() {
     }
@@ -285,6 +287,7 @@ public class RxVolley {
                 }
 
                 request.setTag(httpConfig.mTag);
+                Loger.debug("设置了tag="+httpConfig.mTag);
                 request.setOnProgressListener(progressListener);
 
                 if (TextUtils.isEmpty(httpConfig.mUrl)) {
