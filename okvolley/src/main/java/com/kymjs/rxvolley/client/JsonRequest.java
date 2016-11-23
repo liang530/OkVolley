@@ -50,12 +50,13 @@ public class JsonRequest extends Request<byte[]> {
 
     @Override
     protected void deliverResponse(ArrayList<HttpParamsEntry> headers, byte[] response) {
-        if (mCallback != null) {
+        HttpCallback httpCallback = weakMCallback.get();
+        if (httpCallback != null) {
             HashMap<String, String> map = new HashMap<>(headers.size());
             for (HttpParamsEntry entry : headers) {
                 map.put(entry.k, entry.v);
             }
-            mCallback.onSuccess(map, response);
+            httpCallback.onSuccess(map, response);
         }
     }
 
